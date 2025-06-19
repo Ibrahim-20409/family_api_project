@@ -16,7 +16,7 @@ family_data = [
     {"Fid": 9, "Fname": "Sajid", "Faddress": "Faisalabad"},
     {"Fid": 10, "Fname": "Areeba", "Faddress": "Sialkot"},
     {"Fid": 11, "Fname": "Tahir", "Faddress": "Gujranwala"},
-    {"Fid": 12, "Fname": "Muneeb", "Faddress": "Bahawalpur"},
+    {"Fid": 12, "Fname": "iBRAHIM", "Faddress": "isl"},
 ]
 
 with open("data/family.csv", mode="w", newline="") as file:
