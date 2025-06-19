@@ -3,8 +3,8 @@ from typing import List
 
 from app.database import read_csv, write_csv, FAMILY_FILE, PERSON_FILE
 from app.models import (
-    Family, FamilyCreate, FamilyUpdate, FamilyWithMembers,
-    FamilyWithMembersCreate, Person, PersonUpdate, MemberCreate
+    Family, FamilyCreate, FamilyWithMembers,
+    FamilyWithMembersCreate, Person, PersonInput
 )
 
 router = APIRouter()
@@ -56,10 +56,8 @@ def get_family(fid: int):
 def add_family(data: FamilyWithMembersCreate):
     families = read_csv(FAMILY_FILE)
     persons = read_csv(PERSON_FILE)
-
     new_fid = max([int(f["Fid"]) for f in families], default=0) + 1
     family_dict = {"Fid": str(new_fid), "Fname": data.family.Fname, "Faddress": data.family.Faddress}
-
     max_pid = max([int(p["Pid"]) for p in persons], default=0)
     new_members = []
     for i, member in enumerate(data.members, start=1):
@@ -72,10 +70,8 @@ def add_family(data: FamilyWithMembersCreate):
             "Gender": member.Gender
         }
         new_members.append(member_dict)
-
     families.append(family_dict)
     persons.extend(new_members)
-
     write_csv(FAMILY_FILE, families, ["Fid", "Fname", "Faddress"])
     write_csv(PERSON_FILE, persons, ["Pid", "Fid", "PName", "Qualification", "Gender"])
     return {"message": "Family and members added", "Fid": new_fid, "members_added": len(data.members)}
@@ -90,11 +86,10 @@ def create_family(data: FamilyCreate):
     return Family(Fid=new_fid, Fname=data.Fname, Faddress=data.Faddress)
 
 @router.post("/families/{fid}/members")
-def add_member_to_family(fid: int, member: MemberCreate):
+def add_member_to_family(fid: int, member: PersonInput):
     families = read_csv(FAMILY_FILE)
     if not any(int(f["Fid"]) == fid for f in families):
         raise HTTPException(status_code=404, detail="Family not found")
-
     persons = read_csv(PERSON_FILE)
     new_pid = max([int(p["Pid"]) for p in persons], default=0) + 1
     new_member = {
@@ -109,7 +104,7 @@ def add_member_to_family(fid: int, member: MemberCreate):
     return {"message": "Member added", "Pid": new_pid}
 
 @router.put("/families/{fid}")
-def update_family(fid: int, data: FamilyUpdate):
+def update_family(fid: int, data: FamilyCreate):
     families = read_csv(FAMILY_FILE)
     family = next((f for f in families if int(f["Fid"]) == fid), None)
     if not family:
@@ -120,7 +115,7 @@ def update_family(fid: int, data: FamilyUpdate):
     return {"message": "Family updated"}
 
 @router.put("/persons/{pid}")
-def update_person(pid: int, data: PersonUpdate):
+def update_person(pid: int, data: PersonInput):
     persons = read_csv(PERSON_FILE)
     person = next((p for p in persons if int(p["Pid"]) == pid), None)
     if not person:

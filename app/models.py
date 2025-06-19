@@ -24,17 +24,3 @@ class FamilyWithMembers(BaseModel):
 class FamilyWithMembersCreate(BaseModel):
     family: FamilyCreate
     members: List[PersonInput]
-
-class FamilyUpdate(BaseModel):
-    Fname: str
-    Faddress: str
-
-class PersonUpdate(BaseModel):
-    PName: str
-    Qualification: str
-    Gender: str
-
-class MemberCreate(BaseModel):
-    PName: str
-    Qualification: str
-    Gender: str
